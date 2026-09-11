@@ -16,18 +16,20 @@
   <link rel="stylesheet" href="styles.css?v=2">
   <link rel="stylesheet" href="enhancements.css?v=2">
   <link rel="stylesheet" href="gate.css?v=1">
+  <link rel="stylesheet" href="teddy-heroes.css?v=1">
   <script src="memories.js?v=1" defer></script>
   <script src="app.js?v=3" defer></script>
   <script src="gate.js?v=1" defer></script>
   <script src="magic.js?v=4" defer></script>
   <script src="film.js?v=1" defer></script>
+  <script src="teddy-heroes.js?v=1" defer></script>
 </head>
 <body class="birthday-locked">
   <dialog class="birthday-gate" id="birthdayGate" aria-labelledby="gateTitle" aria-describedby="gateIntro">
     <div class="gate-orbits" aria-hidden="true"><i></i><i></i><i></i><span>✦</span></div>
     <div class="gate-card">
       <p class="eyebrow centered">THE NAVIT ARCHIVE · SEALED WITH LOVE</p>
-      <div class="gate-emblem" aria-hidden="true">n<span>✦</span></div>
+      <div class="gate-teddy-emblem" data-teddy-duo aria-hidden="true"></div>
       <p class="gate-edition">12 SEPTEMBER / THE LITTLE-BHAI EDITION</p>
       <h1 id="gateTitle" tabindex="-1">Some memories<br>are worth <em>unlocking.</em></h1>
       <p id="gateIntro">A little universe, just for you, Navit.<br>Your birthday holds the key.</p>
@@ -57,6 +59,11 @@
         <h1 id="heroTitle">Happy birthday,<br><em>Navit<span class="title-star">✦</span></em></h1>
         <p class="hero-subtitle">My little bhai.<br>My favourite story to watch unfold.</p>
         <p class="hero-description">Not just a birthday wish. A little time machine.<br>For who you were, who you are, and everyone you’ll become.</p>
+        <button class="hero-squad" id="squadCheer" type="button" aria-label="Get a birthday cheer from Navit's teddy superheroes">
+          <span class="squad-art" data-teddy-duo aria-hidden="true"></span>
+          <span class="squad-copy"><span class="squad-eyebrow">YOUR VERY OWN SUPER SQUAD</span><strong>Little bhai.<br>Big main-character energy.</strong><span class="squad-invite">Tap for a birthday cheer <b aria-hidden="true">↗</b></span></span>
+        </button>
+        <p id="squadMessage" class="squad-message" role="status" aria-live="polite" hidden></p>
         <div class="hero-actions"><a class="button primary" id="startButton" href="#story">Step into our story <span aria-hidden="true">↗</span></a><span class="handwritten">made by your forever bhai</span></div>
         <p id="birthdayStatus" class="date-note">A special day. A forever kind of love.</p>
       </div>
@@ -144,6 +151,21 @@
   <dialog id="filmDialog" class="film-dialog" aria-labelledby="filmTitle"><header><span>THE NAVIT ARCHIVE <b>/ THE LITTLE-BHAI CUT</b></span><button class="icon-btn" id="closeFilm" aria-label="Close memory film and return to the archive">✕</button></header><div class="film-stage" id="filmStage"><div class="film-background" id="filmBackground" aria-hidden="true"></div><div class="film-photo-wrap"><img id="filmPhoto" alt=""></div><div class="film-grain" aria-hidden="true"></div><div class="film-meta"><span id="filmChapter">THE BEGINNING</span><span id="filmCounter">01 / 09</span></div></div><div class="film-caption" aria-live="polite"><h2 id="filmTitle">Once upon a very little you.</h2><p id="filmLine">Before the big adventures, there was this.</p></div><footer><div class="film-timeline"><label for="filmScrubber">YOUR LITTLE TIME MACHINE <span id="filmTime">01 / 09</span></label><input id="filmScrubber" type="range" min="0" max="8" step="1" value="0" aria-label="Choose a moment in the memory film"><div class="film-timeline-ends"><span>Little beginnings</span><span>Always us</span></div><div class="film-progress" aria-hidden="true"><i id="filmProgress"></i></div></div><div class="film-controls"><button class="icon-btn" id="filmPrevious" aria-label="Previous film memory">←</button><button class="button primary" id="filmPlay" aria-pressed="true">Pause film Ⅱ</button><button class="icon-btn" id="filmNext" aria-label="Next film memory">→</button><button class="text-button" id="filmSound" aria-pressed="false">Play soundtrack ♫</button></div><p class="film-control-hint" id="filmHint">Pause any time. Drag the timeline to keep a favourite moment.</p></footer></dialog>
   <dialog id="photoDialog" class="photo-dialog" aria-labelledby="photoTitle"><header><span id="photoCounter">MEMORY 01 / 32</span><button class="icon-btn" data-close aria-label="Close photo and return to memories">✕</button></header><div class="photo-stage"><img id="lightboxPhoto" alt=""><button id="previousPhoto" class="photo-arrow previous" aria-label="Previous photo">←</button><button id="nextPhoto" class="photo-arrow next" aria-label="Next photo">→</button></div><div class="photo-caption"><h2 id="photoTitle"></h2><p id="photoDescription"></p></div><footer><button class="text-button" id="slideshowButton" aria-pressed="false">Play the memories ▷</button><button class="button secondary" data-close>Back to memories ↗</button></footer></dialog>
   </div>
-  <noscript><p class="noscript">Happy Birthday, Navit! Your letter and the story above are here for you. Enable JavaScript for the birthday lock, photo archive, music, candles and interactive starlight.</p><style>#birthdayExperience{visibility:visible!important}body.birthday-locked{overflow:auto!important}#birthdayGate{display:none!important}#letterPaper[hidden]{display:block!important}.envelope{display:none}</style></noscript>
+  <template id="teddySquadTemplate"><span class="teddy-duo">
+    <span class="teddy-hero teddy-sun">
+      <i class="teddy-cape"></i><i class="teddy-arm arm-left"></i><i class="teddy-arm arm-right"></i><i class="teddy-body"><b class="teddy-badge">N</b></i>
+      <i class="teddy-ear ear-left"></i><i class="teddy-ear ear-right"></i>
+      <i class="teddy-head"><b class="teddy-eye eye-left"></b><b class="teddy-eye eye-right"></b><b class="teddy-cheek cheek-left"></b><b class="teddy-cheek cheek-right"></b><b class="teddy-muzzle"><i></i></b><b class="teddy-tuft"></b></i>
+      <i class="teddy-foot foot-left"></i><i class="teddy-foot foot-right"></i>
+    </span>
+    <span class="teddy-hero teddy-moon">
+      <i class="teddy-cape"></i><i class="teddy-arm arm-left"></i><i class="teddy-arm arm-right"></i><i class="teddy-body"><b class="teddy-badge">✦</b></i>
+      <i class="teddy-ear ear-left"></i><i class="teddy-ear ear-right"></i>
+      <i class="teddy-head"><b class="teddy-mask"></b><b class="teddy-eye eye-left"></b><b class="teddy-eye eye-right"></b><b class="teddy-cheek cheek-left"></b><b class="teddy-cheek cheek-right"></b><b class="teddy-muzzle"><i></i></b><b class="teddy-tuft"></b></i>
+      <i class="teddy-foot foot-left"></i><i class="teddy-foot foot-right"></i>
+    </span>
+    <i class="squad-spark spark-one">✦</i><i class="squad-spark spark-two">✧</i><i class="squad-spark spark-three">·</i>
+  </span></template>
+  <noscript><p class="noscript">Happy Birthday, Navit! Your letter and the story above are here for you. Enable JavaScript for the birthday lock, photo archive, music, candles and interactive starlight.</p><style>#birthdayExperience{visibility:visible!important}body.birthday-locked{overflow:auto!important}#birthdayGate{display:none!important}#letterPaper[hidden]{display:block!important}.envelope,.hero-squad{display:none}</style></noscript>
 </body>
 </html>
