@@ -53,6 +53,11 @@ function renderSound() {
     $('#filmSound').setAttribute('aria-label', playing ? 'Mute soundtrack' : 'Play soundtrack');
     $('#filmSound').setAttribute('aria-pressed', String(playing));
   }
+  if ($('#vortexSound')) {
+    $('#vortexSound').textContent = playing ? 'Sound on ♫' : 'Sound off ♫';
+    $('#vortexSound').setAttribute('aria-label', playing ? 'Mute the vortex soundtrack' : 'Play the vortex soundtrack');
+    $('#vortexSound').setAttribute('aria-pressed', String(playing));
+  }
 }
 async function setSound(enabled) {
   const request = ++audioRequest;
@@ -93,7 +98,7 @@ function startOnFirstGesture(event) {
   document.removeEventListener('click', startOnFirstGesture, true);
   document.removeEventListener('keydown', startOnFirstGesture, true);
   // A first click on a sound control belongs to that control; do not double-toggle it.
-  if (event.target instanceof Element && event.target.closest('#soundButton,#gateSound,#filmSound,#changeTrack')) return;
+  if (event.target instanceof Element && event.target.closest('#soundButton,#gateSound,#filmSound,#vortexSound,#changeTrack')) return;
   setSound(true);
 }
 document.addEventListener('click', startOnFirstGesture, true);
@@ -153,13 +158,13 @@ if ('IntersectionObserver' in window) {
   $$('.reveal').forEach(el => revealObserver.observe(el));
 }
 
-let filter = 'all', shown = 8;
+let filter = 'all';
 const filtered = () => memories.filter(m => filter === 'all' || m.group === filter);
 function renderGallery() {
   const list = filtered();
   const grid = $('#memoryGrid');
   const fragment = document.createDocumentFragment();
-  for (const memory of list.slice(0, shown)) {
+  for (const memory of list) {
     const figure = document.createElement('figure'); figure.className = 'memory-card';
     const button = document.createElement('button'); button.type = 'button'; button.setAttribute('aria-label', `Open memory: ${memory.title}`);
     const frame = document.createElement('div'); frame.className = 'memory-image';
@@ -171,21 +176,13 @@ function renderGallery() {
     button.addEventListener('click', () => openPhoto(memory.id));
   }
   grid.replaceChildren(fragment);
-  $('#memoryCount').textContent = `${Math.min(shown, list.length)} of ${list.length} little pieces of your story`;
-  $('#loadMemories').hidden = shown >= list.length;
+  $('#memoryCount').textContent = `${list.length} little pieces of your story`;
 }
 $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
-  filter = button.dataset.filter; shown = 8;
+  filter = button.dataset.filter;
   $$('[data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
   renderGallery();
 }));
-$('#loadMemories').addEventListener('click', () => {
-  const oldCount = Math.min(shown, filtered().length);
-  shown += 8; renderGallery();
-  // Keep keyboard users at the first newly revealed memory, not on a hidden button.
-  const next = $('#memoryGrid').children[oldCount]?.querySelector('button');
-  next?.focus({ preventScroll: true });
-});
 renderGallery();
 
 const photoDialog = $('#photoDialog');

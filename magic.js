@@ -15,7 +15,7 @@
   let tiles=[], particles=[], lights=[], coverVisible=false, finaleVisible=false;
   let assemblyTime=0, assembled=false, portraitLoaded=false, frame=0,last=0,clock=0,energy=0;
   let pointer={x:-999,y:-999},pointerActive=false,portraitDirty=true;
-  const birthdayLocked=()=>document.body.classList.contains('birthday-locked');
+  const birthdayLocked=()=>document.body.classList.contains('birthday-locked')||window.navitVortexActive;
   const revealDelay=450,emissionDuration=12500;
   const palette=['#ecc28a','#d7e3c0','#a9d3c5','#92b4c7','#fff2c9'];
   const stars=Array.from({length:95},(_,i)=>({x:Math.random(),y:Math.random(),r:.5+Math.random()*1.2,phase:Math.random()*6.28,i}));
@@ -122,13 +122,14 @@
   function initPortrait(){
     if(!cover.naturalWidth||portraitLoaded)return;
     portraitLoaded=true;resize();makeTiles();portrait.classList.add('canvas-ready');
-    portrait.dataset.state='assembling';
+    portrait.dataset.state=assembled?'assembled':'assembling';
     drawPortrait(0,0);
     if(window.navitMotionPaused)drawStill();else wake();
   }
   cover.addEventListener('load',initPortrait);
   cover.addEventListener('error',()=>portrait.classList.remove('canvas-ready'));
   if(cover.complete&&cover.naturalWidth)initPortrait();
+  window.addEventListener('navit:vortexclose',()=>{last=0;wake();});
   window.addEventListener('navit:unlock',()=>{
     assemblyTime=0;assembled=false;portraitDirty=true;trail=[];last=0;
     portrait.dataset.state='assembling';portrait.dataset.pixels='0';

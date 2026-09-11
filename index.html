@@ -17,12 +17,15 @@
   <link rel="stylesheet" href="enhancements.css?v=2">
   <link rel="stylesheet" href="gate.css?v=1">
   <link rel="stylesheet" href="teddy-heroes.css?v=1">
+  <link rel="stylesheet" href="vortex.css?v=2">
   <script src="memories.js?v=1" defer></script>
-  <script src="app.js?v=3" defer></script>
+  <script src="app.js?v=5" defer></script>
   <script src="gate.js?v=1" defer></script>
-  <script src="magic.js?v=4" defer></script>
+  <script src="magic.js?v=6" defer></script>
   <script src="film.js?v=1" defer></script>
   <script src="teddy-heroes.js?v=1" defer></script>
+  <script src="vortex-renderer.js?v=2" defer></script>
+  <script src="vortex.js?v=2" defer></script>
 </head>
 <body class="birthday-locked">
   <dialog class="birthday-gate" id="birthdayGate" aria-labelledby="gateTitle" aria-describedby="gateIntro">
@@ -56,7 +59,7 @@
     <section class="hero chapter" id="home" data-track="bond" aria-labelledby="heroTitle">
       <div class="hero-copy">
         <p class="eyebrow"><span class="live-dot"></span> 12 SEPTEMBER · THE WORLD GOT A LITTLE BETTER</p>
-        <h1 id="heroTitle">Happy birthday,<br><em>Navit<span class="title-star">✦</span></em></h1>
+        <h1 id="heroTitle">Happy Birthday,<br><em>Navit<span class="title-star">✦</span></em></h1>
         <p class="hero-subtitle">My little bhai.<br>My favourite story to watch unfold.</p>
         <p class="hero-description">Not just a birthday wish. A little time machine.<br>For who you were, who you are, and everyone you’ll become.</p>
         <button class="hero-squad" id="squadCheer" type="button" aria-label="Get a birthday cheer from Navit's teddy superheroes">
@@ -78,6 +81,7 @@
         <div class="light-reading" aria-hidden="true"><span class="source-dot"></span><span id="lightReading">ONE LIGHT. A THOUSAND LITTLE MEMORIES.</span></div>
         <button class="replay-crystals" id="replayCrystals"><span aria-hidden="true">⟲</span> Paint this memory with light</button>
         <p class="crystal-hint">Every little pixel starts from the same light.<br><span>Once it’s complete, move your finger to leave a little starlight.</span></p>
+        <button class="vortex-invite" id="openMemoryVortex" type="button" aria-haspopup="dialog"><span aria-hidden="true">◎</span><span>Something extra: the memory vortex<small>Step inside. Bend time. Catch a little memory.</small></span><b aria-hidden="true">↗</b></button>
       </div>
       <div class="hero-foot"><span>CHACHA ON PAPER. BHAI BY HEART.</span><a href="#story" aria-label="Scroll to chapter one">SCROLL TO REWIND <span aria-hidden="true">↓</span></a></div>
     </section>
@@ -97,7 +101,7 @@
       <button class="memory-film-invite" id="openMemoryFilm" aria-haspopup="dialog"><span class="film-preview"><img src="assets/photos/memory-00.jpeg" alt="" loading="lazy"><img src="assets/photos/memory-17.jpeg" alt="" loading="lazy"><img src="assets/photos/memory-01.jpeg" alt="" loading="lazy"></span><span class="film-invite-copy"><small>THE LITTLE-BHAI CUT · 9 MEMORIES</small><strong>If growing up had a trailer.</strong><span>A little film of us. With a timeline you can rewind.</span></span><span class="film-play-label"><b aria-hidden="true">▷</b> Watch our memory film</span></button>
       <div class="archive-toolbar"><div class="filters" role="group" aria-label="Filter memories"><button data-filter="all" aria-pressed="true">All the magic <span>32</span></button><button data-filter="tiny" aria-pressed="false">Tiny beginnings</button><button data-filter="adventures" aria-pressed="false">Big little adventures</button><button data-filter="us" aria-pressed="false">Your people</button></div><span class="archive-hint">Tap a memory to step inside ↗</span></div>
       <div class="memory-grid" id="memoryGrid"></div>
-      <div class="more-memories"><p id="memoryCount" aria-live="polite"></p><button class="button secondary" id="loadMemories">There’s more to remember <span aria-hidden="true">↓</span></button></div>
+      <div class="more-memories"><p id="memoryCount" aria-live="polite"></p></div>
     </section>
 
     <section class="wish-section chapter" id="wish" data-track="birthday" aria-labelledby="wishTitle">
@@ -151,6 +155,18 @@
   <dialog id="filmDialog" class="film-dialog" aria-labelledby="filmTitle"><header><span>THE NAVIT ARCHIVE <b>/ THE LITTLE-BHAI CUT</b></span><button class="icon-btn" id="closeFilm" aria-label="Close memory film and return to the archive">✕</button></header><div class="film-stage" id="filmStage"><div class="film-background" id="filmBackground" aria-hidden="true"></div><div class="film-photo-wrap"><img id="filmPhoto" alt=""></div><div class="film-grain" aria-hidden="true"></div><div class="film-meta"><span id="filmChapter">THE BEGINNING</span><span id="filmCounter">01 / 09</span></div></div><div class="film-caption" aria-live="polite"><h2 id="filmTitle">Once upon a very little you.</h2><p id="filmLine">Before the big adventures, there was this.</p></div><footer><div class="film-timeline"><label for="filmScrubber">YOUR LITTLE TIME MACHINE <span id="filmTime">01 / 09</span></label><input id="filmScrubber" type="range" min="0" max="8" step="1" value="0" aria-label="Choose a moment in the memory film"><div class="film-timeline-ends"><span>Little beginnings</span><span>Always us</span></div><div class="film-progress" aria-hidden="true"><i id="filmProgress"></i></div></div><div class="film-controls"><button class="icon-btn" id="filmPrevious" aria-label="Previous film memory">←</button><button class="button primary" id="filmPlay" aria-pressed="true">Pause film Ⅱ</button><button class="icon-btn" id="filmNext" aria-label="Next film memory">→</button><button class="text-button" id="filmSound" aria-pressed="false">Play soundtrack ♫</button></div><p class="film-control-hint" id="filmHint">Pause any time. Drag the timeline to keep a favourite moment.</p></footer></dialog>
   <dialog id="photoDialog" class="photo-dialog" aria-labelledby="photoTitle"><header><span id="photoCounter">MEMORY 01 / 32</span><button class="icon-btn" data-close aria-label="Close photo and return to memories">✕</button></header><div class="photo-stage"><img id="lightboxPhoto" alt=""><button id="previousPhoto" class="photo-arrow previous" aria-label="Previous photo">←</button><button id="nextPhoto" class="photo-arrow next" aria-label="Next photo">→</button></div><div class="photo-caption"><h2 id="photoTitle"></h2><p id="photoDescription"></p></div><footer><button class="text-button" id="slideshowButton" aria-pressed="false">Play the memories ▷</button><button class="button secondary" data-close>Back to memories ↗</button></footer></dialog>
   </div>
+  <dialog id="vortexDialog" class="vortex-dialog" aria-labelledby="vortexTitle" aria-describedby="vortexDescription">
+    <header class="vortex-topbar"><span class="vortex-brand">N<span aria-hidden="true">✦</span><small>THE MEMORY VORTEX<br>A LITTLE UNIVERSE, JUST FOR YOU.</small></span><button id="skipVortex" class="vortex-skip" type="button">Back to birthday <span aria-hidden="true">↗</span></button></header>
+    <div class="vortex-heading"><p id="vortexChapter">01 / ALL THE LITTLE MOMENTS</p><h2 id="vortexTitle" tabindex="-1">A universe <em>made of us.</em></h2><p id="vortexDescription">Every laugh. Every little adventure. Every version of you.</p></div>
+    <div class="vortex-stage" id="vortexStage"><div class="vortex-halo" aria-hidden="true"></div><canvas id="vortexCanvas" tabindex="0" role="img" aria-label="Interactive 3D funnel of Navit's memories. Drag or use the arrow keys to rotate it."></canvas><figure class="vortex-photo-frame" id="vortexPhotoFrame" aria-hidden="true"><img id="vortexPhoto" src="assets/photos/memory-00.jpeg" width="1280" height="958" alt="Navit as a newborn in his chacha's arms"></figure><div class="vortex-stage-meta" aria-hidden="true"><span id="vortexReadout">PREPARING YOUR LITTLE UNIVERSE</span><span>12 SEPTEMBER / NAVIT</span></div></div>
+    <footer class="vortex-footer">
+      <p id="vortexStatus" role="status" aria-live="polite">Drag the light. Turn the memories. Take your time.</p>
+      <div class="vortex-progress" role="progressbar" aria-label="Memory reveal progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="vortexProgress"><i></i></div>
+      <div class="vortex-tools"><button id="vortexWarp" class="vortex-control" type="button" aria-pressed="false">◎ Bend time</button><button id="vortexCatch" class="vortex-control" type="button">✧ Catch a memory</button></div>
+      <div class="vortex-controls"><button id="vortexPause" class="vortex-control" type="button" aria-pressed="false">Pause Ⅱ</button><button id="vortexGather" class="button primary" type="button">Bring our first memory back <span aria-hidden="true">↗</span></button><button id="vortexSound" class="vortex-control" type="button" aria-pressed="false">Sound off ♫</button></div>
+      <button id="vortexReplay" class="text-button" type="button" hidden>Rewind this little universe ↺</button><p class="vortex-hint" id="vortexHint">Drag to orbit · Tap a photo · Bend time to fly closer.</p>
+    </footer>
+  </dialog>
   <template id="teddySquadTemplate"><span class="teddy-duo">
     <span class="teddy-hero teddy-sun">
       <i class="teddy-cape"></i><i class="teddy-arm arm-left"></i><i class="teddy-arm arm-right"></i><i class="teddy-body"><b class="teddy-badge">N</b></i>
@@ -166,6 +182,6 @@
     </span>
     <i class="squad-spark spark-one">✦</i><i class="squad-spark spark-two">✧</i><i class="squad-spark spark-three">·</i>
   </span></template>
-  <noscript><p class="noscript">Happy Birthday, Navit! Your letter and the story above are here for you. Enable JavaScript for the birthday lock, photo archive, music, candles and interactive starlight.</p><style>#birthdayExperience{visibility:visible!important}body.birthday-locked{overflow:auto!important}#birthdayGate{display:none!important}#letterPaper[hidden]{display:block!important}.envelope,.hero-squad{display:none}</style></noscript>
+  <noscript><p class="noscript">Happy Birthday, Navit! Your letter and the story above are here for you. Enable JavaScript for the birthday lock, photo archive, music, candles and interactive starlight.</p><style>#birthdayExperience{visibility:visible!important}body.birthday-locked{overflow:auto!important}#birthdayGate{display:none!important}#letterPaper[hidden]{display:block!important}.envelope,.hero-squad,.vortex-invite{display:none}</style></noscript>
 </body>
 </html>
