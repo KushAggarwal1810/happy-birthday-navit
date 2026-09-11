@@ -78,7 +78,7 @@
   $('#filmPrevious').addEventListener('click',()=>{stop();choose(index-1);});
   $('#filmNext').addEventListener('click',()=>{stop();choose(index+1);});
   $('#filmScrubber').addEventListener('input',e=>{stop();choose(Number(e.target.value));});
-  $('#filmSound').addEventListener('click',()=>setSound(!soundWanted));
+  $('#filmSound').addEventListener('click',toggleSound);
   dialog.addEventListener('keydown',e=>{
     if(e.target.matches('input,button'))return;
     if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();stop();choose(index+(e.key==='ArrowRight'?1:-1));}

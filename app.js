@@ -34,34 +34,38 @@ const tracks = {
 };
 Object.values(tracks).forEach(t => { t.el.volume = .45; });
 let activeTrack = 'bond', soundWanted = false, audioRequest = 0, manualTrack = false;
+let playbackPending = false;
 let musicSceneLocked = false;
 function renderSound() {
   const playing = soundWanted && !tracks[activeTrack].el.paused;
+  const waiting = soundWanted && !playing;
+  const label = playing ? 'Sound on' : waiting ? 'Resume ♫' : 'Sound off';
   document.body.classList.toggle('music-playing', playing);
   $('#soundButton').setAttribute('aria-pressed', String(playing));
-  $('#soundButton').setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} music`);
-  $('#soundLabel').textContent = playing ? 'Sound on' : 'Sound off';
+  $('#soundButton').setAttribute('aria-label', `${playing ? 'Mute' : waiting ? 'Resume' : 'Play'} music`);
+  $('#soundLabel').textContent = label;
   $('#trackName').textContent = tracks[activeTrack].title;
   if ($('#gateSound')) {
-    $('#gateSoundLabel').textContent = playing ? 'Sound on' : 'Sound off';
-    $('#gateSound').setAttribute('aria-label', playing ? 'Pause music' : 'Play music');
+    $('#gateSoundLabel').textContent = label;
+    $('#gateSound').setAttribute('aria-label', playing ? 'Mute music' : waiting ? 'Resume music' : 'Play music');
     $('#gateSound').setAttribute('aria-pressed', String(playing));
-    $('#gateAudioHint').textContent = playing ? 'A familiar tune. A very special beginning.' : 'Your first tap starts the soundtrack. Sound is optional.';
+    $('#gateAudioHint').textContent = playing ? 'A familiar tune. A very special beginning.' : waiting ? 'Your music is still on. Tap to resume if your browser paused it.' : 'Your first tap starts the soundtrack. Sound is optional.';
   }
   if ($('#filmSound')) {
-    $('#filmSound').textContent = playing ? 'Mute soundtrack ♫' : 'Play soundtrack ♫';
-    $('#filmSound').setAttribute('aria-label', playing ? 'Mute soundtrack' : 'Play soundtrack');
+    $('#filmSound').textContent = playing ? 'Mute soundtrack ♫' : waiting ? 'Resume soundtrack ♫' : 'Play soundtrack ♫';
+    $('#filmSound').setAttribute('aria-label', playing ? 'Mute soundtrack' : waiting ? 'Resume soundtrack' : 'Play soundtrack');
     $('#filmSound').setAttribute('aria-pressed', String(playing));
   }
   if ($('#vortexSound')) {
-    $('#vortexSound').textContent = playing ? 'Sound on ♫' : 'Sound off ♫';
-    $('#vortexSound').setAttribute('aria-label', playing ? 'Mute the vortex soundtrack' : 'Play the vortex soundtrack');
+    $('#vortexSound').textContent = playing ? 'Sound on ♫' : waiting ? 'Resume ♫' : 'Sound off ♫';
+    $('#vortexSound').setAttribute('aria-label', playing ? 'Mute the vortex soundtrack' : waiting ? 'Resume the vortex soundtrack' : 'Play the vortex soundtrack');
     $('#vortexSound').setAttribute('aria-pressed', String(playing));
   }
 }
 async function setSound(enabled) {
   const request = ++audioRequest;
   soundWanted = enabled;
+  playbackPending = enabled;
   const audio = tracks[activeTrack].el;
   for (const track of Object.values(tracks)) if (!enabled || track.el !== audio) track.el.pause();
   renderSound();
@@ -74,11 +78,21 @@ async function setSound(enabled) {
     }
   } catch (_) {
     if (request !== audioRequest) return;
-    soundWanted = false;
+    // A browser interruption is not the visitor choosing to mute the music.
+    // Keep that intent, and retry on return or the next real gesture.
     audio.pause();
-    toast('Tap Sound to start the soundtrack. Your story is ready either way.');
+    toast('Your browser paused the music. Tap Resume to bring it back.');
+  } finally {
+    if (request === audioRequest) playbackPending = false;
   }
   renderSound();
+}
+function resumeMusic() {
+  if (soundWanted && !document.hidden && !playbackPending && tracks[activeTrack].el.paused) setSound(true);
+}
+function toggleSound() {
+  // A blocked/paused player should resume, not require two clicks to turn back on.
+  setSound(!(soundWanted && !tracks[activeTrack].el.paused));
 }
 function switchTrack(key) {
   if (!tracks[key] || key === activeTrack) return;
@@ -88,8 +102,8 @@ function switchTrack(key) {
   renderSound();
   setSound(soundWanted);
 }
-$('#soundButton').addEventListener('click', () => setSound(!soundWanted));
-$('#gateSound').addEventListener('click', () => setSound(!soundWanted));
+$('#soundButton').addEventListener('click', toggleSound);
+$('#gateSound').addEventListener('click', toggleSound);
 let firstGestureHandled = false;
 function startOnFirstGesture(event) {
   if (firstGestureHandled || !event.isTrusted) return;
@@ -103,6 +117,16 @@ function startOnFirstGesture(event) {
 }
 document.addEventListener('click', startOnFirstGesture, true);
 document.addEventListener('keydown', startOnFirstGesture, true);
+function resumeOnGesture(event) {
+  if (!event.isTrusted || !firstGestureHandled) return;
+  if (event.type === 'keydown' && (event.ctrlKey || event.metaKey || event.altKey || !(/^[0-9a-z ]$/i.test(event.key) || event.key === 'Enter'))) return;
+  if (event.target instanceof Element && event.target.closest('#soundButton,#gateSound,#filmSound,#vortexSound,#changeTrack')) return;
+  resumeMusic();
+}
+document.addEventListener('click', resumeOnGesture, true);
+document.addEventListener('keydown', resumeOnGesture, true);
+window.addEventListener('focus', resumeMusic);
+window.addEventListener('pageshow', resumeMusic);
 $('#changeTrack').addEventListener('click', () => {
   manualTrack = true;
   const keys = Object.keys(tracks);
@@ -112,8 +136,9 @@ $('#changeTrack').addEventListener('click', () => {
 });
 Object.values(tracks).forEach(track => {
   track.el.addEventListener('pause', () => { if (track.el === tracks[activeTrack].el && track.el.paused) renderSound(); });
+  track.el.addEventListener('playing', () => { if (track.el === tracks[activeTrack].el) renderSound(); });
   track.el.addEventListener('error', () => {
-    if (track.el === tracks[activeTrack].el) { soundWanted = false; renderSound(); toast('This song could not load. You can try the next soundtrack.'); }
+    if (track.el === tracks[activeTrack].el) { renderSound(); toast('This song could not load. Tap Resume or try the next soundtrack.'); }
   });
 });
 $('#startButton').addEventListener('click', () => {
@@ -289,5 +314,8 @@ $('#launchStars').addEventListener('click', () => {
   window.navitBurst?.(innerWidth * .5, innerHeight * .45, 130);
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { stopSlideshow(); if (soundWanted) setSound(false); }
+  // Do not mute on tab switches. Keep playing where the browser allows it;
+  // if the OS suspends playback, resume the visitor's chosen music on return.
+  if (document.hidden) stopSlideshow();
+  else resumeMusic();
 });

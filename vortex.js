@@ -165,7 +165,7 @@
     paused=!paused;pause.textContent=paused?'Resume ▷':'Pause Ⅱ';pause.setAttribute('aria-pressed',String(paused));
     if(paused)stop();else wake();
   });
-  $('#vortexSound').addEventListener('click',()=>setSound(!soundWanted));
+  $('#vortexSound').addEventListener('click',toggleSound);
   canvas.addEventListener('pointerdown',event=>{
     if(phase!=='explore'||!event.isPrimary)return;
     drag={x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,moved:false,id:event.pointerId};
